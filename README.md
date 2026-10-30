@@ -41,8 +41,7 @@ The application will start on http://localhost:8080.
    {"valid":true,"reasons":[]}
 
 
-
- Business Rules Implemented
+##Business Rules Implemented
 1. accountId and destinationAccountId are required.
 
 2. Self-transfers are not allowed (e.g., Account A to Account A).
