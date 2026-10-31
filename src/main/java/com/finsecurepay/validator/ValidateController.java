@@ -1,5 +1,6 @@
 package com.finsecurepay.validator;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -9,19 +10,20 @@ import java.util.Map;
 @RestController
 public class ValidateController {
 
+    // This reads the DAILY_LIMIT from application.properties or Kubernetes ConfigMap
+    @Value("${DAILY_LIMIT:10000.00}")
+    private String dailyLimitString;
+
     @PostMapping("/validate")
     public Map<String, Object> validate(@RequestBody Map<String, Object> request) {
         List<String> reasons = new ArrayList<>();
+        BigDecimal dailyLimit = new BigDecimal(dailyLimitString);
 
-        // 1. Extract fields from the JSON request
         String accountId = (String) request.get("accountId");
         String destinationAccountId = (String) request.get("destinationAccountId");
         String currency = (String) request.get("currency");
-        
-        // Handle amount carefully (it might come in as an Integer or a Double from JSON)
         BigDecimal amount = new BigDecimal(request.get("amount").toString());
 
-        // 2. Apply Business Rules
         if (accountId == null || accountId.isBlank()) {
             reasons.add("ACCOUNT_ID_REQUIRED");
         }
@@ -34,14 +36,16 @@ public class ValidateController {
         if (amount.compareTo(new BigDecimal("0.01")) < 0) {
             reasons.add("AMOUNT_TOO_SMALL");
         }
-        if (amount.compareTo(new BigDecimal("10000.00")) > 0) {
+        
+        // Compare against the ConfigMap value!
+        if (amount.compareTo(dailyLimit) > 0) {
             reasons.add("AMOUNT_EXCEEDS_DAILY_LIMIT");
         }
+        
         if (currency == null || !List.of("USD", "EUR", "GBP", "SGD").contains(currency)) {
             reasons.add("UNSUPPORTED_CURRENCY");
         }
 
-        // 3. Return the result
         if (reasons.isEmpty()) {
             return Map.of("valid", true, "reasons", List.of());
         } else {
