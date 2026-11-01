@@ -19,7 +19,7 @@ pipeline {
             steps {
                 echo 'Building and running unit tests...'
                 // Using the Maven wrapper included in the repo
-                sh './mvnw clean package'
+                sh 'sh ./mvnw clean package'
             }
         }
 
