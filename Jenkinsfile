@@ -25,7 +25,6 @@ pipeline {
         stage('Dependency Scan (Trivy)') {
             steps {
                 echo 'Scanning dependencies for known vulnerabilities...'
-                // --ignorefile points to the file in the workspace
                 sh 'trivy fs --exit-code 1 --severity CRITICAL,HIGH --ignorefile .trivyignore --no-progress .'
             }
         }
@@ -42,7 +41,6 @@ pipeline {
         stage('Container Scan (Trivy)') {
             steps {
                 echo 'Scanning Docker image for vulnerabilities...'
-                // Use ${WORKSPACE} so Trivy finds the ignore file on the host path
                 sh "trivy image --exit-code 1 --severity CRITICAL,HIGH --ignorefile ${WORKSPACE}/.trivyignore --no-progress ${IMAGE_NAME}:${IMAGE_TAG}"
             }
         }
@@ -56,6 +54,23 @@ pipeline {
                         docker.image("${IMAGE_NAME}:${IMAGE_TAG}").push('latest')
                     }
                 }
+            }
+        }
+
+        stage('Install Monitoring Stack') {
+            steps {
+                echo 'Installing Prometheus and Grafana via Helm...'
+                sh '''
+                    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts || true
+                    helm repo update
+                    helm upgrade --install monitoring prometheus-community/kube-prometheus-stack \
+                      --namespace monitoring \
+                      --create-namespace \
+                      --set grafana.adminPassword=prom-operator \
+                      --set prometheus-node-exporter.enabled=false \
+                      --wait \
+                      --timeout 5m
+                '''
             }
         }
 
