@@ -25,10 +25,8 @@ pipeline {
         stage('Dependency Scan (Trivy)') {
             steps {
                 echo 'Scanning dependencies for known vulnerabilities...'
-                // Scans the pom.xml for vulnerable libraries. 
-                // --exit-code 1 makes the stage fail if vulnerabilities are found.
-                // --severity CRITICAL,HIGH sets the threshold.
-                sh 'trivy fs --exit-code 1 --severity CRITICAL,HIGH --ignore-unfixed --no-progress .'
+                // --ignorefile points to the file in the workspace
+                sh 'trivy fs --exit-code 1 --severity CRITICAL,HIGH --ignorefile .trivyignore --no-progress .'
             }
         }
 
@@ -44,8 +42,8 @@ pipeline {
         stage('Container Scan (Trivy)') {
             steps {
                 echo 'Scanning Docker image for vulnerabilities...'
-                // Scans the built image. We scan the exact tag we just built.
-                sh "trivy image --exit-code 1 --severity CRITICAL,HIGH --ignore-unfixed --no-progress ${IMAGE_NAME}:${IMAGE_TAG}"
+                // Use ${WORKSPACE} so Trivy finds the ignore file on the host path
+                sh "trivy image --exit-code 1 --severity CRITICAL,HIGH --ignorefile ${WORKSPACE}/.trivyignore --no-progress ${IMAGE_NAME}:${IMAGE_TAG}"
             }
         }
 

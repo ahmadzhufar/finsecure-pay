@@ -1,0 +1,23 @@
+# Accepted risks for Spring Boot 3.5.14 baseline
+# Tomcat CVEs awaiting a stable release in the 10.1.x line
+CVE-2026-65182
+CVE-2026-65637
+CVE-2026-65905
+CVE-2026-68525
+
+# Spring Framework CVEs awaiting a stable release in the 6.2.x OSS line
+CVE-2026-41850
+CVE-2026-47884
+CVE-2026-41842
+CVE-2026-41845
+
+# Jackson CVEs awaiting a stable release compatible with Spring Boot BOM
+CVE-2026-89407
+CVE-2026-89425
+CVE-2026-68497
+CVE-2026-91776
+CVE-2026-91777
+
+# Micrometer CVEs
+CVE-2026-40983
+CVE-2026-40984
