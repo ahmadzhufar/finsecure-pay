@@ -60,17 +60,19 @@ pipeline {
         stage('Install Monitoring Stack') {
             steps {
                 echo 'Installing Prometheus and Grafana via Helm...'
-                sh '''
-                    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts || true
-                    helm repo update
-                    helm upgrade --install monitoring prometheus-community/kube-prometheus-stack \
-                      --namespace monitoring \
-                      --create-namespace \
-                      --set grafana.adminPassword=prom-operator \
-                      --set prometheus-node-exporter.enabled=false \
-                      --wait \
-                      --timeout 5m
-                '''
+                withKubeConfig(credentialsId: 'kubeconfig') {
+                    sh '''
+                        helm repo add prometheus-community https://prometheus-community.github.io/helm-charts || true
+                        helm repo update
+                        helm upgrade --install monitoring prometheus-community/kube-prometheus-stack \
+                          --namespace monitoring \
+                          --create-namespace \
+                          --set grafana.adminPassword=prom-operator \
+                          --set prometheus-node-exporter.enabled=false \
+                          --wait \
+                          --timeout 5m
+                    '''
+                }
             }
         }
 
