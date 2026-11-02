@@ -68,3 +68,13 @@ kubectl logs -n monitoring deployment/monitoring-grafana
 
 # View Prometheus logs
 kubectl logs -n monitoring prometheus-monitoring-kube-prometheus-prometheus-0
+
+## Accessing Monitoring Dashboards
+
+The Jenkins pipeline automatically installs Prometheus and Grafana into the `monitoring` namespace.
+
+To access the dashboards, open **two separate terminal windows** on your laptop and run the following commands. Keep both terminals open while you use the dashboards.
+
+### 1. Access Grafana
+```bash
+kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
