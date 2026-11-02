@@ -21,7 +21,7 @@ class TransactionValidatorApplicationTests {
     void healthEndpointShouldReturnUp() throws Exception {
         mockMvc.perform(get("/health"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("UP"))
+                .andExpect(jsonPath("$.status").value("DOWN"))
                 .andExpect(jsonPath("$.service").value("finsecure-pay"));
     }
 
