@@ -52,4 +52,19 @@ The application will start on http://localhost:8080.
 
 5. Currency must be one of the supported ISO 4217 codes: USD, EUR, GBP, SGD.
 
+## Troubleshooting and Logs
 
+To view logs for the deployed application in Kubernetes, use the following commands:
+
+```bash
+# View logs for all running pods of FinSecure Pay
+kubectl logs -l app=finsecure-pay --tail=100
+
+# View logs for a specific pod
+kubectl logs <pod-name>
+
+# View Grafana logs
+kubectl logs -n monitoring deployment/monitoring-grafana
+
+# View Prometheus logs
+kubectl logs -n monitoring prometheus-monitoring-kube-prometheus-prometheus-0
