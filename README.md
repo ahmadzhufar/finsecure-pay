@@ -52,6 +52,22 @@ The application will start on http://localhost:8080.
 
 5. Currency must be one of the supported ISO 4217 codes: USD, EUR, GBP, SGD.
 
+## Jenkins Setup (for running the pipeline)
+
+This pipeline requires a Jenkins container with the following tools pre-installed:
+- `kubectl` (Kubernetes CLI)
+- `helm` (Kubernetes package manager)
+- `trivy` (security scanner)
+- `docker` (Docker CLI)
+
+To build the custom Jenkins image:
+```bash
+docker build -t finsecure-jenkins -f Dockerfile.jenkins .
+docker run -d -p 8080:8080 -p 50000:50000 \
+  -v jenkins_home:/var/jenkins_home \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  --name jenkins finsecure-jenkins
+
 ## Troubleshooting and Logs
 
 To view logs for the deployed application in Kubernetes, use the following commands:
