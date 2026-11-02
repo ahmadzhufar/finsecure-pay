@@ -78,3 +78,17 @@ To access the dashboards, open **two separate terminal windows** on your laptop 
 ### 1. Access Grafana
 ```bash
 kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
+
+Open your browser to: http://localhost:3000
+
+Username: admin
+
+Password: prom-operator
+
+### 2. Access Prometheus
+
+kubectl port-forward -n monitoring svc/monitoring-kube-prometheus-prometheus 9090:9090
+
+Open your browser to: http://localhost:9090
+
+Note: If a port-forward connection drops (e.g., because a pod was restarted), simply close the terminal and run the command again.
