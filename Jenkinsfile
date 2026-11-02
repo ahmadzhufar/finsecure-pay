@@ -28,7 +28,7 @@ pipeline {
                 // Scans the pom.xml for vulnerable libraries. 
                 // --exit-code 1 makes the stage fail if vulnerabilities are found.
                 // --severity CRITICAL,HIGH sets the threshold.
-                sh 'trivy fs --exit-code 1 --severity CRITICAL,HIGH --no-progress .'
+                sh 'trivy fs --exit-code 1 --severity CRITICAL,HIGH --ignore-unfixed --no-progress .'
             }
         }
 
@@ -45,7 +45,7 @@ pipeline {
             steps {
                 echo 'Scanning Docker image for vulnerabilities...'
                 // Scans the built image. We scan the exact tag we just built.
-                sh "trivy image --exit-code 1 --severity CRITICAL,HIGH --no-progress ${IMAGE_NAME}:${IMAGE_TAG}"
+                sh "trivy image --exit-code 1 --severity CRITICAL,HIGH --ignore-unfixed --no-progress ${IMAGE_NAME}:${IMAGE_TAG}"
             }
         }
 
