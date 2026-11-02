@@ -18,8 +18,17 @@ pipeline {
         stage('Build & Test') {
             steps {
                 echo 'Building and running unit tests...'
-                // Using the Maven wrapper included in the repo
                 sh 'sh ./mvnw clean package'
+            }
+        }
+
+        stage('Dependency Scan (Trivy)') {
+            steps {
+                echo 'Scanning dependencies for known vulnerabilities...'
+                // Scans the pom.xml for vulnerable libraries. 
+                // --exit-code 1 makes the stage fail if vulnerabilities are found.
+                // --severity CRITICAL,HIGH sets the threshold.
+                sh 'trivy fs --exit-code 1 --severity CRITICAL,HIGH --no-progress .'
             }
         }
 
@@ -32,13 +41,20 @@ pipeline {
             }
         }
 
+        stage('Container Scan (Trivy)') {
+            steps {
+                echo 'Scanning Docker image for vulnerabilities...'
+                // Scans the built image. We scan the exact tag we just built.
+                sh "trivy image --exit-code 1 --severity CRITICAL,HIGH --no-progress ${IMAGE_NAME}:${IMAGE_TAG}"
+            }
+        }
+
         stage('Docker Push') {
             steps {
                 echo 'Pushing image to Docker Hub...'
                 script {
                     docker.withRegistry('', 'dockerhub-creds') {
                         docker.image("${IMAGE_NAME}:${IMAGE_TAG}").push()
-                        // Also tag as latest
                         docker.image("${IMAGE_NAME}:${IMAGE_TAG}").push('latest')
                     }
                 }
@@ -49,13 +65,8 @@ pipeline {
             steps {
                 echo 'Deploying to local Docker Desktop K8s...'
                 withKubeConfig(credentialsId: 'kubeconfig') {
-                    // Update the deployment.yaml with the new image tag
                     sh "sed -i 's|image: .*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g' k8s/deployment.yaml"
-                    
-                    // Apply the deployment
                     sh 'kubectl apply -f k8s/'
-                    
-                    // Wait for rollout to finish
                     sh 'kubectl rollout status deployment/finsecure-deployment'
                 }
             }
