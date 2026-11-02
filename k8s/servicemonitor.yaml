@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: finsecure-pay-monitor
+  namespace: monitoring     # <--- MUST be in the monitoring namespace
+  labels:
+    release: monitoring      # <--- Matches the Helm release name
+spec:
+  namespaceSelector:
+    matchNames:
+      - default              # <--- Look for Services in the default namespace
+  selector:
+    matchLabels:
+      app: finsecure-pay
+  endpoints:
+  - port: http
+    path: /actuator/prometheus
+    interval: 15s
