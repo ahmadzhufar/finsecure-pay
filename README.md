@@ -33,7 +33,7 @@ To run this project locally, you will need:
 ### 1. GET /health
 
 curl.exe http://localhost:8080/health
-```
+
 **Response:**
 
 {"status":"UP","service":"finsecure-pay"}
@@ -78,12 +78,19 @@ docker run -d -p 8080:8080 -p 50000:50000 \
 
 To view logs for the deployed application in Kubernetes:
 
+# Get pod names
+
+kubectl get pods -l app=finsecure-pay
 
 # View logs for all running pods of FinSecure Pay
 kubectl logs -l app=finsecure-pay --tail=100
 
 # View logs for a specific pod
 kubectl logs <pod-name>
+
+# describe gives you events, resource usage, and error messages:
+
+kubectl describe pod <pod-name>
 
 # View Grafana logs
 kubectl logs -n monitoring deployment/monitoring-grafana
