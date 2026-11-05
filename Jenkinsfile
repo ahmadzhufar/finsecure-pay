@@ -69,6 +69,8 @@ pipeline {
                           --create-namespace \
                           --set grafana.adminPassword=prom-operator \
                           --set prometheus-node-exporter.enabled=false \
+                          --set grafana.persistence.enabled=true \
+                          --set grafana.persistence.size=1Gi \
                           --wait \
                           --timeout 5m
                     '''
